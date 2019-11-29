@@ -12,17 +12,23 @@ public with sharing class likeCondition implements iSOQLFilterCondition{
     }
 
     public String create(){
-        String condition;
+        String condition = this.field + ' ';
         String valueToCompare = String.escapeSingleQuotes(this.value);
-        System.debug('>>>>>>>>>> ' + this.likeType);
-        if(this.likeType == LIKE_TYPE.STARTS_WITH){
-            condition = OPERATOR + valueToCompare;
-        } else if(this.likeType == LIKE_TYPE.CONTAINS_WHOLE){
-            condition = OPERATOR + valueToCompare + OPERATOR;
-        } else if(this.likeType == likeCondition.LIKE_TYPE.ENDS_WITH){
-            condition = valueToCompare + OPERATOR;
-        }
-
+        
+        switch on this.likeType {
+            when STARTS_WITH{
+                condition += OPERATOR + valueToCompare;
+            } 
+            when CONTAINS_WHOLE{
+                condition += OPERATOR + valueToCompare + OPERATOR;
+            } 
+            when ENDS_WITH{
+                condition += valueToCompare + OPERATOR;
+            }
+            when else{
+                condition = '';
+            }
+        }        
         return condition;
     }
 }

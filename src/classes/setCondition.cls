@@ -2,30 +2,39 @@ public with sharing class setCondition implements iSOQLFilterCondition{
     public String field;
     Static final String SET_OPERATOR = 'IN';
     public list<Object> values;
+
+    public setCondition(String f, List<Object> v){
+        this.field = f;
+        this.values = v;
+    }
   
     public String create(){
         Boolean stringType;
         String condition;
+        if(!this.values.isEmpty())
+            condition = this.field + ' ';
+        else 
+            return null;
 
-        if(!values.isEmpty())
-            stringType = this.values[0] instanceOf String;
-        
-        if(stringType){
-            list<String> sanitizedSOQLTxtValues = new List<String>();
+        switch on (this.values[0] instanceOf String ? 'String' : 'Other'){
+            when 'String' {
+                list<String> sanitizedSOQLTxtValues = new List<String>();
 
-            for(Object value : values){
-                String txtVal = String.format('\' {0} \'', new List<String> {string.escapeSingleQuotes(String.valueOf(value))});
-                sanitizedSOQLTxtValues.add(txtVal);
+                for(Object value : values){
+                    String txtVal = '\'' + string.escapeSingleQuotes(String.valueOf(value)) + '\'';
+                    sanitizedSOQLTxtValues.add(txtVal);
+                }
+                condition += SET_OPERATOR + ' ' + '(' + String.join(sanitizedSOQLTxtValues, ',') + ')';
             }
-            condition = SET_OPERATOR + '(' + String.join(sanitizedSOQLTxtValues, ',') + ')';
-        } else {
-            list<String> soqlNonStringValues = new list<String>();
-            for(Object value : values){                
-                soqlNonStringValues.add(string.escapeSingleQuotes(String.valueOf(value)));
+            when else{
+                list<String> soqlNonStringValues = new list<String>();
+                for(Object value : values){                
+                    soqlNonStringValues.add(string.escapeSingleQuotes(String.valueOf(value)));
+                }
+                condition += SET_OPERATOR + ' ' + '(' + String.join(soqlNonStringValues, ',') + ')';
             }
-            condition = SET_OPERATOR + '(' + String.join(soqlNonStringValues, ',') + ')';
-        }        
-
+        }
+       
         return condition;
     }
 }
