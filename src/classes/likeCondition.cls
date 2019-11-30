@@ -1,8 +1,10 @@
 public with sharing class likeCondition implements iSOQLFilterCondition{
-    public String field;
-    static Final String OPERATOR = '%';
-    public String value;
     public enum LIKE_TYPE {STARTS_WITH, CONTAINS_WHOLE, ENDS_WITH, CONTAINS_EACH_WORD}
+
+    public String field;
+    static Final String OPERATOR = 'LIKE';
+    static Final String WILD_CARD = '%';
+    public String value;    
     public LIKE_TYPE likeType;
 
     public likeCondition(String f, String v, LIKE_TYPE lt){
@@ -12,18 +14,18 @@ public with sharing class likeCondition implements iSOQLFilterCondition{
     }
 
     public String create(){
-        String condition = this.field + ' ';
-        String valueToCompare = String.escapeSingleQuotes(this.value);
+        String condition = this.field + ' ' + OPERATOR + ' ';
+        String valueToCompare = String.escapeSingleQuotes(this.value); // Handle SOQL injection.
         
         switch on this.likeType {
             when STARTS_WITH{
-                condition += OPERATOR + valueToCompare;
+                condition += '\'' + WILD_CARD + valueToCompare + '\'';
             } 
             when CONTAINS_WHOLE{
-                condition += OPERATOR + valueToCompare + OPERATOR;
+                condition += '\'' + WILD_CARD + valueToCompare + WILD_CARD + '\'';
             } 
             when ENDS_WITH{
-                condition += valueToCompare + OPERATOR;
+                condition += valueToCompare + WILD_CARD + '\'';
             }
             when else{
                 condition = '';

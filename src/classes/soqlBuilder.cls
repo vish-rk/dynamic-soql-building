@@ -13,18 +13,22 @@ public with sharing class soqlBuilder {
                                     String fieldList, // comma separated field List
                                     String filtersPayload, //JSON payload filters for WHERE clause
                                     String sortField, // ORDER BY field
-                                    String sortOrder // Sort order
+                                    SORT_ORDER sortOrder // Sort order
                                     ){
         String whereClause = buildWhere(filtersPayload); 
-        String formedSOQL = String.format(soqlTemplate, new list<String>{sObjectName, fieldList, filtersPayload, sortField, sortOrder});
+        String formedSOQL = String.format(soqlTemplate, new list<String>{fieldList, 
+                                                                        sObjectName, 
+                                                                        whereClause, 
+                                                                        sortField, 
+                                                                        sortOrder == SORT_ORDER.ASCENDING ? 'ASC': 'DESC'});
         return formedSOQL;
     }
 
     static String buildWhere(String filtersPayLoad){
-        List<soqlFilterDTO> filters = (List<soqlFilterDTO>)JSON.deserialize(filtersPayload, List<soqlFilterDTO>.class);
+        soqlFilterDTO filterDTO = (soqlFilterDTO)JSON.deserialize(filtersPayload, soqlFilterDTO.class);
         list<iSOQLFilterCondition> filterConditions = new list<iSOQLFilterCondition>();
 
-        for(soqlFilterDTO filter : filters){
+        for(soqlFilterDTO.fieldFilter filter : filterDTO.fieldFilterVals){
             switch on filter.type{
                 when 'equals'{
                     filterConditions.add(new arithmaticCondition(filter.field, '=', filter.value));
@@ -40,10 +44,12 @@ public with sharing class soqlBuilder {
                 }
             }
         }
-        String whereClause = '';
+
+        list<String> filterStrings = new list<String>();
         for(iSOQLFilterCondition filter: filterConditions){
-           whereClause += filter.create();
+           filterStrings.add(filter.create());  
         }
+        String whereClause = String.format(filterDTO.filterLogic, filterStrings);
         return whereClause;
     }
 }

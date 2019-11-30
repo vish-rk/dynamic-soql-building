@@ -12,7 +12,7 @@ public with sharing class arithmaticCondition implements iSOQLFilterCondition {
 
     public String create(){
         String condition;
-        String santizedInput = string.escapeSingleQuotes(string.valueOf(this.value));
+        String santizedInput = string.escapeSingleQuotes(string.valueOf(this.value)); // Handle SOQL Injection
         if(this.value instanceOf String)
             condition = String.format('{0} {1} {2}', new list<String> { this.field, 
                                                                         this.operator, 

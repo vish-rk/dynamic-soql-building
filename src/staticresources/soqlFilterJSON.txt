@@ -1,0 +1,24 @@
+{
+    "filterLogic" : "{0} AND {1} AND {2}",
+    "fieldFilterVals" : 
+        [    
+            {
+                "sno" : "1",
+                "type": "equals",
+                "field": "Id",
+                "value": "101"
+            },
+            {
+                "sno" : "2",
+                "type": "like_contains_each_word",
+                "field": "Name",
+                "value": "Vishnu"
+            },
+            {
+                "sno" : "3",
+                "type": "set_contains",
+                "field": "Skills",
+                "value": "Mule, SFDC"
+            }    
+        ]    
+}

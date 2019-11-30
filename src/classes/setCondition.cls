@@ -21,7 +21,7 @@ public with sharing class setCondition implements iSOQLFilterCondition{
                 list<String> sanitizedSOQLTxtValues = new List<String>();
 
                 for(Object value : values){
-                    String txtVal = '\'' + string.escapeSingleQuotes(String.valueOf(value)) + '\'';
+                    String txtVal = '\'' + string.escapeSingleQuotes(String.valueOf(value)) + '\''; //Handle SOQL Injection.
                     sanitizedSOQLTxtValues.add(txtVal);
                 }
                 condition += SET_OPERATOR + ' ' + '(' + String.join(sanitizedSOQLTxtValues, ',') + ')';
@@ -29,7 +29,7 @@ public with sharing class setCondition implements iSOQLFilterCondition{
             when else{
                 list<String> soqlNonStringValues = new list<String>();
                 for(Object value : values){                
-                    soqlNonStringValues.add(string.escapeSingleQuotes(String.valueOf(value)));
+                    soqlNonStringValues.add(string.escapeSingleQuotes(String.valueOf(value))); //Handle SOQL Injection.
                 }
                 condition += SET_OPERATOR + ' ' + '(' + String.join(soqlNonStringValues, ',') + ')';
             }
