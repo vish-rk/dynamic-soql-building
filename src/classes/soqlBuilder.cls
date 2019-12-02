@@ -38,7 +38,9 @@ public with sharing class soqlBuilder {
                 }
                 when 'set_contains'{
                     filterConditions.add(new setCondition(filter.field, 
-                                                            new stringList(filter.value.Split(',')).trim()));
+                                                            new stringList(filter.value.Split(',')).trim()  //CAUTION: This trim call causes a loop over string values. 
+                                                                                                            //So, if you are sure you wount need the trimming, feel free to remove it.
+                                                            ));
                 }
                 when else{
                     throw new SoqlBuilderException('Invalid filter type is selected for where clause.');
