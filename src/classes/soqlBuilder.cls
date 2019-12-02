@@ -33,11 +33,12 @@ public with sharing class soqlBuilder {
                 when 'equals'{
                     filterConditions.add(new arithmaticCondition(filter.field, '=', filter.value));
                 }
-                when 'like_contains_each_word'{
+                when 'like_contains_whole'{
                     filterConditions.add(new likeCondition(filter.field, filter.value, likeCondition.LIKE_TYPE.CONTAINS_WHOLE));
                 }
                 when 'set_contains'{
-                    filterConditions.add(new setCondition(filter.field, filter.value.Split(',')));
+                    filterConditions.add(new setCondition(filter.field, 
+                                                            new stringList(filter.value.Split(',')).trim()));
                 }
                 when else{
                     throw new SoqlBuilderException('Invalid filter type is selected for where clause.');

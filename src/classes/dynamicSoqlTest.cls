@@ -2,13 +2,14 @@
 public with sharing class dynamicSoqlTest {
     @isTest
     public static void testFilterCreation() {
-        list<iSOQLFilterCondition> conditions = new list<iSOQLFilterCondition>();
-        conditions.add(new arithmaticCondition('Id','=', 101));
-        conditions.add(new likeCondition('Name', 'Vishnu', likeCondition.LIKE_TYPE.CONTAINS_WHOLE)); 
-        conditions.add(new setCondition('Skills', new list<Object>{'SFDC', 'Mule'}));
-
-        for(iSOQLFilterCondition condition: conditions){
-            System.debug('>>>>>>>>>>>>>>'+ condition.create());
-        }
+        soqlFilterDTO filterDTO = new soqlFilterDTO();
+        filterDTO.filterLogic = '{0} AND {1} AND {2}';
+        filterDTO.fieldFilterVals = new list<soqlFilterDTO.fieldFilter>{new soqlFilterDTO.fieldFilter('1', 'equals', 'Id', '101'),
+                                                                        new soqlFilterDTO.fieldFilter('2', 'like_contains_whole', 'Name', 'vishnu'),
+                                                                        new soqlFilterDTO.fieldFilter('3', 'set_contains', 'Skills__c', 'Mule, SFDC')};
+        
+        String filtersPayload = JSON.serialize(filterDTO);
+        System.assertEquals('SELECT Id, Name FROM Account WHERE Id = \'101\' AND Name LIKE \'%vishnu%\' AND Skills__c IN (\'Mule\',\'SFDC\') ORDER BY Name ASC',
+                            soqlBuilder.buildSOQL('Account', 'Id, Name', filtersPayload, 'Name', soqlBuilder.SORT_ORDER.ASCENDING));
     }
 }
