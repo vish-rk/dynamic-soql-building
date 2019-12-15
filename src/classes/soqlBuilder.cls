@@ -1,9 +1,10 @@
 public with sharing class soqlBuilder {
-    public soqlBuilder() {
-
-    }
-
+    
     public class SoqlBuilderException extends Exception{}
+
+    public static final string INVALID_FILTER_TYPE = 'Invalid filter type is selected for where clause.';
+
+    public static final string INVALID_FILTER_LOGIC = 'Invalid filter logic.';
     
     public enum SORT_ORDER {ASCENDING, DESCENDING}
 
@@ -22,10 +23,14 @@ public with sharing class soqlBuilder {
                                                                         sortField, 
                                                                         sortOrder == SORT_ORDER.ASCENDING ? 'ASC': 'DESC'});
         return formedSOQL;
-    }
+    }    
 
-    static String buildWhere(String filtersPayLoad){
+    static String buildWhere(String filtersPayLoad){        
         soqlFilterDTO filterDTO = (soqlFilterDTO)JSON.deserialize(filtersPayload, soqlFilterDTO.class);
+
+        if(String.isBlank(filterDTO.filterLogic))
+            throw new soqlBuilderException(INVALID_FILTER_LOGIC);
+
         list<iSOQLFilterCondition> filterConditions = new list<iSOQLFilterCondition>();
 
         for(soqlFilterDTO.fieldFilter filter : filterDTO.fieldFilterVals){
@@ -36,6 +41,9 @@ public with sharing class soqlBuilder {
                 when 'like_contains_whole'{
                     filterConditions.add(new likeCondition(filter.field, filter.value, likeCondition.LIKE_TYPE.CONTAINS_WHOLE));
                 }
+                when 'like_contains_each_word'{
+                    filterConditions.add(new likeCondition(filter.field, filter.value, likeCondition.LIKE_TYPE.CONTAINS_EACH_WORD));
+                }
                 when 'set_contains'{
                     filterConditions.add(new setCondition(filter.field, 
                                                             new stringList(filter.value.Split(',')).trim()  //CAUTION: This trim call causes a loop over string values. 
@@ -43,7 +51,7 @@ public with sharing class soqlBuilder {
                                                             ));
                 }
                 when else{
-                    throw new SoqlBuilderException('Invalid filter type is selected for where clause.');
+                    throw new SoqlBuilderException(INVALID_FILTER_TYPE);
                 }
             }
         }

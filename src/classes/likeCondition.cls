@@ -24,6 +24,10 @@ public with sharing class likeCondition implements iSOQLFilterCondition{
             when CONTAINS_WHOLE{
                 condition += '\'' + WILD_CARD + valueToCompare + WILD_CARD + '\'';
             } 
+            when CONTAINS_EACH_WORD{
+                String spaceMatcher = '\\s+';
+                condition += '\'' + WILD_CARD + valueToCompare.replaceAll(spaceMatcher, WILD_CARD) + WILD_CARD + '\'';
+            }
             when ENDS_WITH{
                 condition += valueToCompare + WILD_CARD + '\'';
             }
