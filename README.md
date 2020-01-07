@@ -1,5 +1,5 @@
 # Dynamic SOQL building 
-# Build SOQL in a strcutured, scalable and maintaible way.
+# Build SOQL in a strcutured, scalable and maintainable way.
 
 1. Use soqlBuilder.buildSOQL() to building your dynamic string query. Covered arithmatic, like(%) and set filtering.
 
